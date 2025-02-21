@@ -7,14 +7,13 @@ import torch.nn as nn
 
 
 class FeedForward(nn.Module):
-    def __init__(self, d_model: int, d_ff: int, dropout: float = 0.1):
+    def __init__(self, d_model: int, d_ff: int):
         """
         Initialize FeedForward model.
 
         Args:
             d_model (int): The number of expected features in the input.
             d_ff (int): The number of expected features in the output.
-            dropout (float, optional): The dropout probability. Defaults to 0.1.
         """
         super(FeedForward, self).__init__()
         self.W1 = nn.Linear(d_model, d_ff)
