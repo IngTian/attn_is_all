@@ -2,10 +2,11 @@
 Multi-Head Attention implementation as described in 'Attention Is All You Need'.
 """
 
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 from torch import Tensor
-from typing import Tuple
 
 
 class MultiHeadAttention(nn.Module):

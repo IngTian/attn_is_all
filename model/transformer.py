@@ -16,11 +16,11 @@ Expected Tensor Shapes throughout the model:
     - Output: (batch_size, tgt_seq_len, vocab_size)
 """
 
-import torch
 import torch.nn as nn
 from torch import Tensor
-from model.encoder import Encoder
+
 from model.decoder import Decoder
+from model.encoder import Encoder
 from model.positional_encoding import PositionalEncoding
 
 

@@ -11,8 +11,9 @@ Input Shape:
 """
 
 import torch
-from torch import Tensor
 import torch.nn as nn
+from torch import Tensor
+
 from model.attention import MultiHeadAttention
 from model.feed_forward import FeedForward
 

@@ -2,8 +2,8 @@
 The feed forward neural network model.
 """
 
-from torch import Tensor
 import torch.nn as nn
+from torch import Tensor
 
 
 class FeedForward(nn.Module):

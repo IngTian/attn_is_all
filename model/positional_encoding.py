@@ -6,10 +6,11 @@ position information to the input embeddings. The encoding uses
 sine and cosine functions of different frequencies.
 """
 
-import torch
-from torch import Tensor
-import torch.nn as nn
 import math
+
+import torch
+import torch.nn as nn
+from torch import Tensor
 
 
 class PositionalEncoding(nn.Module):
