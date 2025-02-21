@@ -65,7 +65,7 @@ class MultiHeadAttention(nn.Module):
         return x.view(batch_size, seq_len, self.num_of_heads, self.d_k).transpose(1, 2)
 
     def scaled_dot_product_attention(
-        self, Q: Tensor, K: Tensor, V: Tensor
+        self, Q: Tensor, K: Tensor, V: Tensor, masks: Tensor = None
     ) -> Tuple[Tensor, Tensor]:
         """Compute scaled dot-product attention as described in the paper.
 
@@ -73,15 +73,26 @@ class MultiHeadAttention(nn.Module):
             Q (Tensor): Query tensor of shape (batch_size, num_of_heads, seq_len, d_k)
             K (Tensor): Key tensor of shape (batch_size, num_of_heads, seq_len, d_k)
             V (Tensor): Value tensor of shape (batch_size, num_of_heads, seq_len, d_k)
+            apply_masks (bool): Whether to apply masks to the attention weights
 
         Returns:
             Tuple[Tensor, Tensor]:
                 - Output tensor of shape (batch_size, num_of_heads, seq_len, d_k)
                 - Attention weights of shape (batch_size, num_of_heads, seq_len, seq_len)
         """
+        attn_scores = torch.matmul(Q, K.transpose(-1, -2)) / torch.sqrt(
+            torch.tensor(self.d_k, dtype=Q.dtype, device=Q.device)
+        )
+
+        if masks is not None:
+            # Apply masks to the attention weights.
+            attn_scores = attn_scores.masked_fill(
+                masks == 0,
+                float("-inf"),
+            )
+
         attn_weights = torch.softmax(
-            torch.matmul(Q, K.transpose(-1, -2))
-            / torch.sqrt(torch.tensor(self.d_k, dtype=Q.dtype, device=Q.device)),
+            attn_scores,
             -1,
         )
 
@@ -99,7 +110,7 @@ class MultiHeadAttention(nn.Module):
         batch_size, _, seq_len, _ = x.size()
         return x.transpose(1, 2).contiguous().view(batch_size, seq_len, self.d_model)
 
-    def forward(self, Q: Tensor, K: Tensor, V: Tensor) -> Tensor:
+    def forward(self, Q: Tensor, K: Tensor, V: Tensor, masks: Tensor = None) -> Tensor:
         """Compute multi-head attention.
 
         Args:
@@ -116,7 +127,7 @@ class MultiHeadAttention(nn.Module):
         V = self.split_head(self.W_V(V))
 
         # Run through scaled dot-product attention.
-        v, _ = self.scaled_dot_product_attention(Q, K, V)
+        v, _ = self.scaled_dot_product_attention(Q, K, V, masks)
 
         # Combine heads.
         combined_v = self.concatenate_heads(v)
