@@ -53,7 +53,7 @@ class MultiHeadAttention(nn.Module):
         self.W_V = nn.Linear(d_model, d_model)
         self.W_O = nn.Linear(d_model, d_model)
 
-    def split_head(self, x: Tensor) -> Tensor:
+    def __split_head(self, x: Tensor) -> Tensor:
         """Split the last dimension of input into (num_of_heads, d_k) and transpose.
 
         Args:
@@ -65,7 +65,7 @@ class MultiHeadAttention(nn.Module):
         batch_size, seq_len, d_model = x.size()
         return x.view(batch_size, seq_len, self.num_of_heads, self.d_k).transpose(1, 2)
 
-    def scaled_dot_product_attention(
+    def __scaled_dot_product_attention(
         self, Q: Tensor, K: Tensor, V: Tensor, masks: Tensor = None
     ) -> Tuple[Tensor, Tensor]:
         """Compute scaled dot-product attention as described in the paper.
@@ -99,7 +99,7 @@ class MultiHeadAttention(nn.Module):
 
         return torch.matmul(attn_weights, V), attn_weights
 
-    def concatenate_heads(self, x: Tensor) -> Tensor:
+    def __concatenate_heads(self, x: Tensor) -> Tensor:
         """Transpose and reshape the input back to original dimensions.
 
         Args:
@@ -123,14 +123,14 @@ class MultiHeadAttention(nn.Module):
             Tensor: Output tensor of shape (batch_size, seq_len, d_model)
         """
         # Get Q, K, V after apply W_Q, W_K, and W_V.
-        Q = self.split_head(self.W_Q(Q))
-        K = self.split_head(self.W_K(K))
-        V = self.split_head(self.W_V(V))
+        Q = self.__split_head(self.W_Q(Q))
+        K = self.__split_head(self.W_K(K))
+        V = self.__split_head(self.W_V(V))
 
         # Run through scaled dot-product attention.
-        v, _ = self.scaled_dot_product_attention(Q, K, V, masks)
+        v, _ = self.__scaled_dot_product_attention(Q, K, V, masks)
 
         # Combine heads.
-        combined_v = self.concatenate_heads(v)
+        combined_v = self.__concatenate_heads(v)
 
         return self.W_O(combined_v)
