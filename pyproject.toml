@@ -1,0 +1,55 @@
+# Enable pycodestyle ('E'), pyflakes ('F'), and isort ('I') rules
+select = ["E", "F", "I", "N", "D", "UP", "ANN", "S", "B", "C4", "T20", "RET", "SIM"]
+ignore = ["ANN101", "D203", "D212"]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+# Enable auto-fixing
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude tests and other non-source files
+exclude = [
+    ".bzr",
+    ".git",
+    ".hg",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pycache__",
+    "venv",
+    ".env",
+    "build",
+    "dist",
+]
+
+# Use double quotes for strings. 
+quote-style = "double"
+# Indent with spaces.
+indent-style = "space"
+# Skip magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Use Google-style docstrings.
+convention = "google"
+
+[tool.ruff.isort]
+# Combine multiple imports from the same module onto a single line.
+combine-as-imports = true
+# Sort by module name length.
+length-sort = true
+
+[tool.ruff.mccabe]
+# Maximum McCabe complexity allowed.
+max-complexity = 10
+
+[tool.ruff.per-file-ignores]
+# Ignore unused imports in __init__.py files
+"__init__.py" = ["F401"]
+# Ignore some rules in test files
+"tests/*" = ["S101", "ANN201"]
