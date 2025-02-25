@@ -43,6 +43,7 @@ class Transformer(nn.Module):
         enc_layer_count (int, optional): Number of encoder layers. Defaults to 6.
         dec_layer_count (int, optional): Number of decoder layers. Defaults to 6.
         d_model (int, optional): Model's dimension. Defaults to 512.
+        d_input (int, optional): Input embedding dimension. Defaults to 768.
         num_of_heads (int, optional): Number of attention heads. Defaults to 8.
         d_ff (int, optional): Feed-forward network's hidden dimension. Defaults to 2048.
         p_drop (float, optional): Dropout probability. Defaults to 0.1.
@@ -65,6 +66,7 @@ class Transformer(nn.Module):
         enc_layer_count: int = 6,
         dec_layer_count: int = 6,
         d_model: int = 512,
+        d_input: int = 768,
         num_of_heads: int = 8,
         d_ff: int = 2048,
         p_drop: float = 0.1,
@@ -77,6 +79,7 @@ class Transformer(nn.Module):
         self.enc_layer_count = enc_layer_count
         self.dec_layer_count = dec_layer_count
         self.d_model = d_model
+        self.d_input = d_input
         self.num_of_heads = num_of_heads
         self.d_ff = d_ff
         self.p_drop = p_drop
@@ -100,6 +103,7 @@ class Transformer(nn.Module):
             p_drop_layer,
         )
 
+        self.emb_transform_layer = nn.Linear(d_input, d_model)
         self.positional_encoding = PositionalEncoding(d_model, max_seq_length)
         self.output_layer = nn.Linear(d_model, vocab_size)
 
@@ -127,8 +131,8 @@ class Transformer(nn.Module):
         Returns:
             Tensor: Output logits of shape (batch_size, tgt_seq_len, vocab_size)
         """
-        src = self.positional_encoding(src)
-        tgt = self.positional_encoding(tgt)
+        src = self.positional_encoding(self.emb_transform_layer(src))
+        tgt = self.positional_encoding(self.emb_transform_layer(tgt))
 
         enc_output = self.encoder(src, src_masks)
         dec_output = self.decoder(tgt, enc_output, src_masks, tgt_masks)
